@@ -30,6 +30,85 @@ setInterval(
 }, 86400000);
 
 
+// Get Country Code for ISS location
+let getCountryCode = url => {
+    var XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
+    var xmlHttp = new XMLHttpRequest();
+    
+    xmlHttp.onreadystatechange = function() {
+  
+        if (xmlHttp.readyState === 4 && xmlHttp.status === 200) {
+          let ISSCountryLocation = JSON.parse(xmlHttp.responseText);
+          
+          // is there a geoName?
+          if (ISSCountryLocation.geonames[0]) {
+            let ISScountryCode = ISSCountryLocation.geonames[0].countryCode;
+            let ISScountryName = ISSCountryLocation.geonames[0].countryName;
+            // document.getElementById('countryCode').innerText = `${ISScountryName}: ${ISScountryCode}`;
+            // send countryCode to database.
+            firebase.database().ref('currentCountry/').set({
+              code: ISScountryCode
+            });
+          }
+          else {
+            console.log('agua');
+        
+          }
+        } else if (xmlHttp.readyState === 4 && xmlHttp.status === 404) {
+            console.error("ERROR! 404");
+            console.info(JSON.parse(xmlHttp.responseText));
+        }
+    };
+    xmlHttp.open("GET", url, true);
+    xmlHttp.send();
+  }
+  
+  
+  // Get ISS current location
+  setInterval(
+  function locateISS() {
+
+    var XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
+    var xmlHttp = new XMLHttpRequest();
+    
+    xmlHttp.onreadystatechange = function() {
+  
+        if (xmlHttp.readyState === 4 && xmlHttp.status === 200) {
+          let ISSlocation = JSON.parse(xmlHttp.responseText);
+          if(ISSlocation.message === 'success'){
+            const USERNAME = 'sergitxu';
+            // get ISS latitude and longitude
+            let ISSlatitude = ISSlocation.iss_position.latitude;
+            let ISSlongitude = ISSlocation.iss_position.longitude;
+  
+            // getCountry based on latitude and longitude
+            let countryCodeUrl = `http://api.geonames.org/findNearbyJSON?username=${USERNAME}&lat=${ISSlatitude}&lng=${ISSlongitude}`;
+  
+            const latlon = `${ISSlatitude},${ISSlongitude}`;
+            // TODO show real map? Cuidado si cobran
+            // TODO Mostrar recorrido
+            // TODO show a ISS logo in the map
+            // Show position in a map
+            const googleMapsKey = "AIzaSyApZj382B_afAx4ecNtytJFhvWhTf9WvWw";
+            const img_url = `https://maps.googleapis.com/maps/api/staticmap?center=${latlon}&zoom=5&size=400x300&sensor=false&key=${googleMapsKey}`;
+
+            firebase.database().ref('currentPosition/').set({
+                urlMap: img_url
+              });
+
+            // document.getElementById('positionMap').src = `${img_url}`;
+            getCountryCode(countryCodeUrl);
+          }
+          
+        } else if (xmlHttp.readyState === 4 && xmlHttp.status === 404) {
+            console.error("ERROR! 404");
+            console.info(JSON.parse(xmlHttp.responseText));
+        }
+    };
+    xmlHttp.open("GET", 'http://api.open-notify.org/iss-now.json', true);
+    xmlHttp.send();
+  }, 1000);
+
 //(function(){
 
   // https://blogs.nasa.gov/spacestation/feed/
