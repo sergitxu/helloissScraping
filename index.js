@@ -46,11 +46,13 @@ let getCountryCode = url => {
             let ISScountryName = ISSCountryLocation.geonames[0].countryName;
             // document.getElementById('countryCode').innerText = `${ISScountryName}: ${ISScountryCode}`;
             // send countryCode to database.
-            firebase.database().ref('currentCountry/').set({
-              code: ISScountryCode,
-              name: ISScountryName
-            });
-            getCountryMusic(ISScountryName);
+            if (ISScountryCode) {
+              firebase.database().ref('currentCountry/').set({
+                code: ISScountryCode,
+                name: ISScountryName
+              });
+              getCountryMusic(ISScountryName);
+            } else { console.log('No hay ISScountryCode' + ISScountryCode)}
           }
           else {
             console.log('agua');
