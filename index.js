@@ -50,13 +50,10 @@ let getCountryCode = url => {
               code: ISScountryCode,
               name: ISScountryName
             });
-
-
             getCountryMusic(ISScountryName);
           }
           else {
             console.log('agua');
-        
           }
         } else if (xmlHttp.readyState === 4 && xmlHttp.status === 404) {
             console.error("ERROR! 404");
