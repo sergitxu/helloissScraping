@@ -39,7 +39,7 @@ let getCountryCode = url => {
   
         if (xmlHttp.readyState === 4 && xmlHttp.status === 200) {
           let ISSCountryLocation = JSON.parse(xmlHttp.responseText);
-          
+
           // is there a geoName?
           if (ISSCountryLocation.geonames[0]) {
             let ISScountryCode = ISSCountryLocation.geonames[0].countryCode;
@@ -47,8 +47,12 @@ let getCountryCode = url => {
             // document.getElementById('countryCode').innerText = `${ISScountryName}: ${ISScountryCode}`;
             // send countryCode to database.
             firebase.database().ref('currentCountry/').set({
-              code: ISScountryCode
+              code: ISScountryCode,
+              name: ISScountryName
             });
+
+
+            getCountryMusic(ISScountryName);
           }
           else {
             console.log('agua');
@@ -63,8 +67,8 @@ let getCountryCode = url => {
     xmlHttp.send();
   }
   
-  
   // Get ISS current location
+  // execute once a minute
   setInterval(
   function locateISS() {
 
@@ -93,10 +97,9 @@ let getCountryCode = url => {
             const img_url = `https://maps.googleapis.com/maps/api/staticmap?center=${latlon}&zoom=5&size=400x300&sensor=false&key=${googleMapsKey}`;
 
             firebase.database().ref('currentPosition/').set({
-                urlMap: img_url
-              });
-
-            // document.getElementById('positionMap').src = `${img_url}`;
+              urlMap: img_url
+            });
+            
             getCountryCode(countryCodeUrl);
           }
           
@@ -107,7 +110,41 @@ let getCountryCode = url => {
     };
     xmlHttp.open("GET", 'http://api.open-notify.org/iss-now.json', true);
     xmlHttp.send();
-  }, 1000);
+  }, 60000);
+
+// Get popular music in current country 
+let getCountryMusic = countryName => {
+  let XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
+  let xmlHttp = new XMLHttpRequest();
+  let url = 'http://ws.audioscrobbler.com/2.0/?method=geo.gettoptracks&country=' + countryName + '&api_key=0b60a68567872af2073bd9efe40081de&format=json'
+
+  xmlHttp.onreadystatechange = function() {
+
+      if (xmlHttp.readyState === 4 && xmlHttp.status === 200) {
+        let mostListenedSong = JSON.parse(xmlHttp.responseText);
+
+        let mostListenedSongName = mostListenedSong.tracks.track[0].name;
+        let mostListenedSongArtist = mostListenedSong.tracks.track[0].artist.name;
+        let mostListenedSongUrl = mostListenedSong.tracks.track[0].url;
+        let mostListenedSongImage = mostListenedSong.tracks.track[0].image[2]["#text"];
+        console.log(`${countryName} ${mostListenedSongName} ${mostListenedSongArtist} ${mostListenedSongUrl} ${mostListenedSongImage}`);
+
+        firebase.database().ref('song/').set({
+          name: mostListenedSongName,
+          artist: mostListenedSongArtist,
+          url: mostListenedSongUrl,
+          image: mostListenedSongImage
+        });
+
+      } else if (xmlHttp.readyState === 4 && xmlHttp.status === 404) {
+          console.error("ERROR! 404");
+          console.info(JSON.parse(xmlHttp.responseText));
+      }
+  };
+  xmlHttp.open("GET", url, true);
+  xmlHttp.send();
+}
+
 
 //(function(){
 
