@@ -144,6 +144,25 @@ let getCountryMusic = countryName => {
   xmlHttp.send();
 }
 
+  // Get crew info from NASA
+  setInterval(
+  function getCrew() {
+    let XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
+    let xmlHttp = new XMLHttpRequest();
+    xmlHttp.onreadystatechange = function() {
+      if (xmlHttp.readyState === 4 && xmlHttp.status === 200) {
+        let crew = JSON.parse(xmlHttp.responseText).people;
+        firebase.database().ref('cosmonaut/').set({
+          crew
+        });
+      } else if (xmlHttp.readyState === 4 && xmlHttp.status === 404) {
+          console.error("ERROR! 404");
+          console.info(JSON.parse(xmlHttp.responseText));
+      }
+    };
+    xmlHttp.open("GET", "http://api.open-notify.org/astros.json", true);
+    xmlHttp.send();
+}, 86400000);
 
 //(function(){
 
