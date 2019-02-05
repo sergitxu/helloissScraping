@@ -35,27 +35,29 @@ setInterval(
   .then(response => {
       const $ = cheerio.load(response.data);
 
-      let titles = [];
-      let urls = [];
-      let images = []
+      var ISSNews = {
+          title: [],
+          urls: [],
+          images: []
+      };
 
       $('article header h2.entry-title a').each(function() {
-        titles.push($(this).text());
-        urls.push($(this).attr('href'));       
+        ISSNews.title.push($(this).text());
+      });
+      $('article header h2.entry-title a').each(function() {
+        ISSNews.urls.push($(this).attr('href'));      
       });
       $('article .entry-content figure a img').each(function() {
-        images.push($(this).attr('src'));       
+        ISSNews.images.push($(this).attr('src'));       
       });
       firebase.database().ref('ISSNews/').set({
-        title: titles,
-        url: urls,
-        img: images
+        ISSNews
       });
   })
   .catch(error => {
       console.log('error', error);
   });
-}, 86400000);
+}, 1000);
 
 
 // Get Country Code for ISS location
