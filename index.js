@@ -57,7 +57,7 @@ setInterval(
   .catch(error => {
       console.log('error', error);
   });
-}, 1000);
+}, 86400000);
 
 
 // Get Country Code for ISS location
