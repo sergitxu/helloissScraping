@@ -21,12 +21,40 @@ setInterval(
         firebase.database().ref('ISSCrewImage/').set({
             url: issCrewImg
         });
-
-        
     })
     .catch(error => {
         console.log('error', error);
     });
+}, 86400000);
+
+//Get ISS news
+
+setInterval(
+  function getISSNews() {
+  axios.get('https://blogs.nasa.gov/spacestation/')
+  .then(response => {
+      const $ = cheerio.load(response.data);
+
+      let titles = [];
+      let urls = [];
+      let images = []
+
+      $('article header h2.entry-title a').each(function() {
+        titles.push($(this).text());
+        urls.push($(this).attr('href'));       
+      });
+      $('article .entry-content figure a img').each(function() {
+        images.push($(this).attr('src'));       
+      });
+      firebase.database().ref('ISSNews/').set({
+        title: titles,
+        url: urls,
+        img: images
+      });
+  })
+  .catch(error => {
+      console.log('error', error);
+  });
 }, 86400000);
 
 
