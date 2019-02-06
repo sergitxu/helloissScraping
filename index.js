@@ -36,7 +36,7 @@ setInterval(
       const $ = cheerio.load(response.data);
 
       var news = {
-          title: [],
+          titles: [],
           urls: [],
           images: []
       };
