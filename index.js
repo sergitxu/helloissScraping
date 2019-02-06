@@ -35,23 +35,23 @@ setInterval(
   .then(response => {
       const $ = cheerio.load(response.data);
 
-      var ISSNews = {
+      var news = {
           title: [],
           urls: [],
           images: []
       };
 
       $('article header h2.entry-title a').each(function() {
-        ISSNews.title.push($(this).text());
+        news.titles.push($(this).text());
       });
       $('article header h2.entry-title a').each(function() {
-        ISSNews.urls.push($(this).attr('href'));      
+        news.urls.push($(this).attr('href'));      
       });
       $('article .entry-content figure a img').each(function() {
-        ISSNews.images.push($(this).attr('src'));       
+        news.images.push($(this).attr('src'));       
       });
       firebase.database().ref('ISSNews/').set({
-        ISSNews
+        news
       });
   })
   .catch(error => {
