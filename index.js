@@ -88,7 +88,7 @@ let getCountryCode = url => {
                 name: ISScountryName
               });
               getCountryMusic(ISScountryName);
-            } else { console.log('No hay ISScountryCode' + ISScountryCode)}
+            } else { console.log('No hay ISScountryCode')}
           }
           else {
             console.log('agua');
@@ -144,7 +144,7 @@ let getCountryCode = url => {
     };
     xmlHttp.open("GET", 'http://api.open-notify.org/iss-now.json', true);
     xmlHttp.send();
-  }, 60000);
+  }, 6000);
 
 // Get popular music in current country 
 let getCountryMusic = countryName => {
@@ -157,13 +157,12 @@ let getCountryMusic = countryName => {
       if (xmlHttp.readyState === 4 && xmlHttp.status === 200) {
         let mostListenedSong = JSON.parse(xmlHttp.responseText);
 
-	if(mostListenedSong.tracks){
+	if(mostListenedSong.tracks.track[0]){
 	        let mostListenedSongName = mostListenedSong.tracks.track[0].name;
 	        let mostListenedSongArtist = mostListenedSong.tracks.track[0].artist.name;
 	        let mostListenedSongUrl = mostListenedSong.tracks.track[0].url;
 	        let mostListenedSongImage = mostListenedSong.tracks.track[0].image[2]["#text"];
-	        console.log(`${countryName} ${mostListenedSongName} ${mostListenedSongArtist} ${mostListenedSongUrl} ${mostListenedSongImage}`);
-	
+
 	        firebase.database().ref('song/').set({
 	          name: mostListenedSongName,
 	          artist: mostListenedSongArtist,
