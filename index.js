@@ -66,14 +66,20 @@ let getCountryCode = url => {
     var xmlHttp = new XMLHttpRequest();
     
     xmlHttp.onreadystatechange = function() {
-  
+
         if (xmlHttp.readyState === 4 && xmlHttp.status === 200) {
           let ISSCountryLocation = JSON.parse(xmlHttp.responseText);
 
           // is there a geoName?
-          if (ISSCountryLocation.geonames[0]) {
-            let ISScountryCode = ISSCountryLocation.geonames[0].countryCode;
-            let ISScountryName = ISSCountryLocation.geonames[0].countryName;
+          if (ISSCountryLocation.geonames[0] && ISSCountryLocation.geonames[0] != undefined) {
+            let ISScountryCode;
+		if(ISSCountryLocation.geonames[0].countryCode) {
+		ISScountryCode = ISSCountryLocation.geonames[0].countryCode;
+		}
+            let ISScountryName;
+		if(ISSCountryLocation.geonames[0].countryName) {
+		ISScountryName = ISSCountryLocation.geonames[0].countryName;
+		}
             // document.getElementById('countryCode').innerText = `${ISScountryName}: ${ISScountryCode}`;
             // send countryCode to database.
             if (ISScountryCode) {
@@ -128,7 +134,6 @@ let getCountryCode = url => {
             firebase.database().ref('currentPosition/').set({
               urlMap: img_url
             });
-            
             getCountryCode(countryCodeUrl);
           }
           
@@ -152,18 +157,20 @@ let getCountryMusic = countryName => {
       if (xmlHttp.readyState === 4 && xmlHttp.status === 200) {
         let mostListenedSong = JSON.parse(xmlHttp.responseText);
 
-        let mostListenedSongName = mostListenedSong.tracks.track[0].name;
-        let mostListenedSongArtist = mostListenedSong.tracks.track[0].artist.name;
-        let mostListenedSongUrl = mostListenedSong.tracks.track[0].url;
-        let mostListenedSongImage = mostListenedSong.tracks.track[0].image[2]["#text"];
-        console.log(`${countryName} ${mostListenedSongName} ${mostListenedSongArtist} ${mostListenedSongUrl} ${mostListenedSongImage}`);
-
-        firebase.database().ref('song/').set({
-          name: mostListenedSongName,
-          artist: mostListenedSongArtist,
-          url: mostListenedSongUrl,
-          image: mostListenedSongImage
-        });
+	if(mostListenedSong.tracks){
+	        let mostListenedSongName = mostListenedSong.tracks.track[0].name;
+	        let mostListenedSongArtist = mostListenedSong.tracks.track[0].artist.name;
+	        let mostListenedSongUrl = mostListenedSong.tracks.track[0].url;
+	        let mostListenedSongImage = mostListenedSong.tracks.track[0].image[2]["#text"];
+	        console.log(`${countryName} ${mostListenedSongName} ${mostListenedSongArtist} ${mostListenedSongUrl} ${mostListenedSongImage}`);
+	
+	        firebase.database().ref('song/').set({
+	          name: mostListenedSongName,
+	          artist: mostListenedSongArtist,
+	          url: mostListenedSongUrl,
+          	image: mostListenedSongImage
+      	 	});
+	}
 
       } else if (xmlHttp.readyState === 4 && xmlHttp.status === 404) {
           console.error("ERROR! 404");
