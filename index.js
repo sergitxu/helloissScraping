@@ -71,58 +71,36 @@ let getCountryCode = url => {
           let ISSCountryLocation = JSON.parse(xmlHttp.responseText);
 
 			if (ISSCountryLocation) {
-			  // is there a geoName?
 			  if (ISSCountryLocation.geonames[0]) {
 				console.log(ISSCountryLocation);
 				let ISScountryCode;
 				let ISScountryName;
 				let ISStoponymName;
 				
-				// Check and set country code
-				if(ISSCountryLocation.geonames[0].countryCode) {
+				// Check and set country code, country name and toponym name
+				if(ISSCountryLocation.geonames[0].countryCode && ISSCountryLocation.geonames[0].countryName && ISSCountryLocation.geonames[0].toponymName) {
+					
 					ISScountryCode = ISSCountryLocation.geonames[0].countryCode;
-					firebase.database().ref('currentCountryCode/').set({
-						code: ISScountryCode
-					});
-				} else {
-					firebase.database().ref('currentCountryCode/').set({
-						code: ''
-					});
-					console.log('No hay ISScountryCode');
-				}
-				
-				// Check and set country name
-				if(ISSCountryLocation.geonames[0].countryName) {
 					ISScountryName = ISSCountryLocation.geonames[0].countryName;
-					firebase.database().ref('currentCountryName/').set({
-						name: ISScountryName
-					 });
-					 getCountryMusic(ISScountryName);
-				} else { 
-					firebase.database().ref('currentCountryName/').set({
-						name: ''
+					ISStoponymName = ISSCountryLocation.geonames[0].toponymName;
+					
+					console.log(`countryCode: ${ISScountryCode}, countryName: ${ISScountryName}, toponymName: ${ISStoponymName}`);
+					
+					firebase.database().ref('currentCountry/').set({
+						code: ISScountryCode,
+						name: ISScountryName,
+						toponym: ISStoponymName
 					});
-					console.log('No hay ISScountryName');
+					
+					getCountryMusic(ISScountryName);
+					
+				} else {
+					console.log('No hay ISScountryCode, ISScountryName o ISStoponymName');
 				}
 				
-				// Check and set toponym name
-				if (ISSCountryLocation.geonames[0].countryName && ISSCountryLocation.geonames[0].toponymName) {
-					ISStoponymName = ISSCountryLocation.geonames[0].toponymName;
-					firebase.database().ref('currentCountryToponym/').set({
-						toponym: ISStoponymName
-					 });
-				} else { 
-					firebase.database().ref('currentCountryToponym/').set({
-						toponym: ''
-					});	
-					console.log('No hay ISStoponymName');
-				}     
-			  }
+			  } else { console.log('agua'); }
 		  }
-          else {
-            console.log('agua');
-            // TODO change title to "Last seen at..."
-          }
+          
         } else if (xmlHttp.readyState === 4 && xmlHttp.status === 404) {
             console.error("ERROR! 404");
             console.info(JSON.parse(xmlHttp.responseText));
@@ -154,10 +132,8 @@ let getCountryCode = url => {
             let countryCodeUrl = `http://api.geonames.org/findNearbyJSON?username=${USERNAME}&lat=${ISSlatitude}&lng=${ISSlongitude}`;
   
             const latlon = `${ISSlatitude},${ISSlongitude}`;
-            // TODO show real map? Cuidado si cobran
             // TODO Mostrar recorrido
             // TODO show a ISS logo in the map
-            // Show position in a map
             const googleMapsKey = "AIzaSyApZj382B_afAx4ecNtytJFhvWhTf9WvWw";
             const img_url = `https://maps.googleapis.com/maps/api/staticmap?center=${latlon}&zoom=5&size=400x300&sensor=false&key=${googleMapsKey}`;
 
