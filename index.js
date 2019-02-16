@@ -47,7 +47,7 @@ setInterval(
       $('article header h2.entry-title a').each(function() {
         news.urls.push($(this).attr('href'));      
       });
-      $('article .entry-content figure a img').each(function() {
+      $('article .entry-content figure img').each(function() {
         news.images.push($(this).attr('src'));       
       });
       firebase.database().ref('ISSNews/').set({
@@ -70,28 +70,58 @@ let getCountryCode = url => {
         if (xmlHttp.readyState === 4 && xmlHttp.status === 200) {
           let ISSCountryLocation = JSON.parse(xmlHttp.responseText);
 
-          // is there a geoName?
-          if (ISSCountryLocation.geonames[0] && ISSCountryLocation.geonames[0] != undefined) {
-            let ISScountryCode;
-		if(ISSCountryLocation.geonames[0].countryCode) {
-		ISScountryCode = ISSCountryLocation.geonames[0].countryCode;
-		}
-            let ISScountryName;
-		if(ISSCountryLocation.geonames[0].countryName) {
-		ISScountryName = ISSCountryLocation.geonames[0].countryName;
-		}
-            // document.getElementById('countryCode').innerText = `${ISScountryName}: ${ISScountryCode}`;
-            // send countryCode to database.
-            if (ISScountryCode) {
-              firebase.database().ref('currentCountry/').set({
-                code: ISScountryCode,
-                name: ISScountryName
-              });
-              getCountryMusic(ISScountryName);
-            } else { console.log('No hay ISScountryCode')}
-          }
+			if (ISSCountryLocation) {
+			  // is there a geoName?
+			  if (ISSCountryLocation.geonames[0]) {
+				console.log(ISSCountryLocation);
+				let ISScountryCode;
+				let ISScountryName;
+				let ISStoponymName;
+				
+				// Check and set country code
+				if(ISSCountryLocation.geonames[0].countryCode) {
+					ISScountryCode = ISSCountryLocation.geonames[0].countryCode;
+					firebase.database().ref('currentCountryCode/').set({
+						code: ISScountryCode
+					});
+				} else {
+					firebase.database().ref('currentCountryCode/').set({
+						code: ''
+					});
+					console.log('No hay ISScountryCode');
+				}
+				
+				// Check and set country name
+				if(ISSCountryLocation.geonames[0].countryName) {
+					ISScountryName = ISSCountryLocation.geonames[0].countryName;
+					firebase.database().ref('currentCountryName/').set({
+						name: ISScountryName
+					 });
+					 getCountryMusic(ISScountryName);
+				} else { 
+					firebase.database().ref('currentCountryName/').set({
+						name: ''
+					});
+					console.log('No hay ISScountryName');
+				}
+				
+				// Check and set toponym name
+				if (ISSCountryLocation.geonames[0].countryName && ISSCountryLocation.geonames[0].toponymName) {
+					ISStoponymName = ISSCountryLocation.geonames[0].toponymName;
+					firebase.database().ref('currentCountryToponym/').set({
+						toponym: ISStoponymName
+					 });
+				} else { 
+					firebase.database().ref('currentCountryToponym/').set({
+						toponym: ''
+					});	
+					console.log('No hay ISStoponymName');
+				}     
+			  }
+		  }
           else {
             console.log('agua');
+            // TODO change title to "Last seen at..."
           }
         } else if (xmlHttp.readyState === 4 && xmlHttp.status === 404) {
             console.error("ERROR! 404");
@@ -144,7 +174,7 @@ let getCountryCode = url => {
     };
     xmlHttp.open("GET", 'http://api.open-notify.org/iss-now.json', true);
     xmlHttp.send();
-  }, 6000);
+  }, 60000);
 
 // Get popular music in current country 
 let getCountryMusic = countryName => {
@@ -157,19 +187,23 @@ let getCountryMusic = countryName => {
       if (xmlHttp.readyState === 4 && xmlHttp.status === 200) {
         let mostListenedSong = JSON.parse(xmlHttp.responseText);
 
-	if(mostListenedSong.tracks.track[0]){
-	        let mostListenedSongName = mostListenedSong.tracks.track[0].name;
-	        let mostListenedSongArtist = mostListenedSong.tracks.track[0].artist.name;
-	        let mostListenedSongUrl = mostListenedSong.tracks.track[0].url;
-	        let mostListenedSongImage = mostListenedSong.tracks.track[0].image[2]["#text"];
+		if(mostListenedSong.tracks){
+				let mostListenedSongName = mostListenedSong.tracks.track[0].name;
+				let mostListenedSongArtist = mostListenedSong.tracks.track[0].artist.name;
+				let mostListenedSongUrl = mostListenedSong.tracks.track[0].url;
+				let mostListenedSongImage = mostListenedSong.tracks.track[0].image[2]["#text"];
 
-	        firebase.database().ref('song/').set({
-	          name: mostListenedSongName,
-	          artist: mostListenedSongArtist,
-	          url: mostListenedSongUrl,
-          	image: mostListenedSongImage
-      	 	});
-	}
+				firebase.database().ref('song/').set({
+				  name: mostListenedSongName,
+				  artist: mostListenedSongArtist,
+				  url: mostListenedSongUrl,
+				image: mostListenedSongImage
+				});
+		}
+		else if (mostListenedSong.error){
+			console.log(`error: ${mostListenedSong.error}, ${mostListenedSong.message}`);
+		}
+	// TODO sacar el código de error {"error":6,"message":"country param required","links":[]}
 
       } else if (xmlHttp.readyState === 4 && xmlHttp.status === 404) {
           console.error("ERROR! 404");
