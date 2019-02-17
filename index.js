@@ -61,12 +61,13 @@ setInterval(
 
 // Get popular music in current country 
 let getCountryMusic = countryName => {
+
   let XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
   let xmlHttp = new XMLHttpRequest()
   let url = `http://ws.audioscrobbler.com/2.0/?method=geo.gettoptracks&country=${countryName}&api_key=0b60a68567872af2073bd9efe40081de&format=json`
 
-  xmlHttp.onreadystatechange = function() {
 
+  xmlHttp.onreadystatechange = function() {
       if (xmlHttp.readyState === 4 && xmlHttp.status === 200) {
         let mostListenedSong = JSON.parse(xmlHttp.responseText);
         
@@ -82,7 +83,7 @@ let getCountryMusic = countryName => {
 				mostListenedSongArtist = mostListenedSong.tracks.track[0].artist.name;
 				mostListenedSongUrl = mostListenedSong.tracks.track[0].url;
 				mostListenedSongImage = mostListenedSong.tracks.track[0].image[2]["#text"];
-				
+
 				firebase.database().ref('song/').set({
 				  name: mostListenedSongName,
 				  artist: mostListenedSongArtist,
@@ -93,7 +94,7 @@ let getCountryMusic = countryName => {
 		}
 		// Empty song values
 		else {
-			console.log('empty song values');
+			console.log(`empty song values for ${countryName}`);
 			firebase.database().ref('song/').set({
 			  name: '',
 			  artist: '',
