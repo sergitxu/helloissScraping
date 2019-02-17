@@ -59,6 +59,59 @@ setInterval(
   });
 }, 86400000);
 
+// Get popular music in current country 
+let getCountryMusic = countryName => {
+  let XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
+  let xmlHttp = new XMLHttpRequest()
+  let url = `http://ws.audioscrobbler.com/2.0/?method=geo.gettoptracks&country=${countryName}&api_key=0b60a68567872af2073bd9efe40081de&format=json`
+
+  xmlHttp.onreadystatechange = function() {
+
+      if (xmlHttp.readyState === 4 && xmlHttp.status === 200) {
+        let mostListenedSong = JSON.parse(xmlHttp.responseText);
+        
+        let mostListenedSongName;
+        let mostListenedSongArtist;
+        let mostListenedSongUrl;
+        let mostListenedSongImage;
+
+		// If there is song info
+		if(mostListenedSong.tracks.track[0] !== undefined){
+			
+				mostListenedSongName = mostListenedSong.tracks.track[0].name;
+				mostListenedSongArtist = mostListenedSong.tracks.track[0].artist.name;
+				mostListenedSongUrl = mostListenedSong.tracks.track[0].url;
+				mostListenedSongImage = mostListenedSong.tracks.track[0].image[2]["#text"];
+				
+				firebase.database().ref('song/').set({
+				  name: mostListenedSongName,
+				  artist: mostListenedSongArtist,
+				  url: mostListenedSongUrl,
+				  image: mostListenedSongImage
+				});
+
+		}
+		// Empty song values
+		else {
+			console.log('empty song values');
+			firebase.database().ref('song/').set({
+			  name: '',
+			  artist: '',
+			  url: '',
+			  image: ''
+			});
+			
+			if (mostListenedSong.error){console.error(`error: ${mostListenedSong.error}, ${mostListenedSong.message}`);}
+		}
+
+      } else if (xmlHttp.readyState === 4 && xmlHttp.status === 404) {
+          console.error("ERROR! 404");
+          console.info(JSON.parse(xmlHttp.responseText));
+      }
+  };
+  xmlHttp.open("GET", url, true);
+  xmlHttp.send();
+}
 
 // Get Country Code for ISS location
 let getCountryCode = url => {
@@ -94,11 +147,13 @@ let getCountryCode = url => {
 					
 					getCountryMusic(ISScountryName);
 					
+					
+				// We miss one of the required country's data
 				} else {
 					console.log('No hay ISScountryCode, ISScountryName o ISStoponymName');
 				}
-				
-			  } else { console.log('agua'); }
+				// There is no country location info
+			  } else { console.log('agua');}
 		  }
           
         } else if (xmlHttp.readyState === 4 && xmlHttp.status === 404) {
@@ -151,44 +206,7 @@ let getCountryCode = url => {
     xmlHttp.open("GET", 'http://api.open-notify.org/iss-now.json', true);
     xmlHttp.send();
   }, 60000);
-
-// Get popular music in current country 
-let getCountryMusic = countryName => {
-  let XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
-  let xmlHttp = new XMLHttpRequest();
-  let url = 'http://ws.audioscrobbler.com/2.0/?method=geo.gettoptracks&country=' + countryName + '&api_key=0b60a68567872af2073bd9efe40081de&format=json'
-
-  xmlHttp.onreadystatechange = function() {
-
-      if (xmlHttp.readyState === 4 && xmlHttp.status === 200) {
-        let mostListenedSong = JSON.parse(xmlHttp.responseText);
-
-		if(mostListenedSong.tracks){
-				let mostListenedSongName = mostListenedSong.tracks.track[0].name;
-				let mostListenedSongArtist = mostListenedSong.tracks.track[0].artist.name;
-				let mostListenedSongUrl = mostListenedSong.tracks.track[0].url;
-				let mostListenedSongImage = mostListenedSong.tracks.track[0].image[2]["#text"];
-
-				firebase.database().ref('song/').set({
-				  name: mostListenedSongName,
-				  artist: mostListenedSongArtist,
-				  url: mostListenedSongUrl,
-				image: mostListenedSongImage
-				});
-		}
-		else if (mostListenedSong.error){
-			console.log(`error: ${mostListenedSong.error}, ${mostListenedSong.message}`);
-		}
-	// TODO sacar el código de error {"error":6,"message":"country param required","links":[]}
-
-      } else if (xmlHttp.readyState === 4 && xmlHttp.status === 404) {
-          console.error("ERROR! 404");
-          console.info(JSON.parse(xmlHttp.responseText));
-      }
-  };
-  xmlHttp.open("GET", url, true);
-  xmlHttp.send();
-}
+  
 
   // Get crew info from NASA
   setInterval(
