@@ -6,9 +6,20 @@ var firebase = require('firebase').initializeApp({
 
 const cheerio = require ('cheerio');
 const axios = require('axios');
+const TelegramBot = require('node-telegram-bot-api');
+const Telegramtoken = '781813938:AAHPG6npR0OCZUgWrbc6nV98cqFZqPZqnbo';
 
 let database = firebase.database();
 
+
+// Telegram bot
+const bot = new TelegramBot(Telegramtoken, {polling: true});
+let botMessage='Let me check, ask me in a minute.'
+bot.on('message', (msg) => {
+	bot.sendMessage(msg.chat.id, botMessage);
+});
+
+					
 // Get Crew Image
 // Execute once a day
 setInterval(
@@ -76,6 +87,9 @@ let getCountryMusic = countryName => {
         let mostListenedSongUrl;
         let mostListenedSongImage;
 
+
+		// TODO try Cocos [Keeling] Islands
+
 		// If there is song info
 		if(mostListenedSong.tracks.track[0] !== undefined){
 			
@@ -123,7 +137,6 @@ let getCountryCode = url => {
 
         if (xmlHttp.readyState === 4 && xmlHttp.status === 200) {
           let ISSCountryLocation = JSON.parse(xmlHttp.responseText);
-
 			if (ISSCountryLocation) {
 			  if (ISSCountryLocation.geonames[0]) {
 				console.log(ISSCountryLocation);
@@ -140,6 +153,9 @@ let getCountryCode = url => {
 					
 					console.log(`countryCode: ${ISScountryCode}, countryName: ${ISScountryName}, toponymName: ${ISStoponymName}`);
 					
+					// message to be sent by Telegram's bot
+					botMessage = `The ISS is flying over ${ISStoponymName} (${ISScountryName}).`;
+
 					firebase.database().ref('currentCountry/').set({
 						code: ISScountryCode,
 						name: ISScountryName,
@@ -148,13 +164,16 @@ let getCountryCode = url => {
 					
 					getCountryMusic(ISScountryName);
 					
-					
 				// We miss one of the required country's data
 				} else {
 					console.log('No hay ISScountryCode, ISScountryName o ISStoponymName');
 				}
 				// There is no country location info
-			  } else { console.log('agua');}
+			  } else {
+				  console.log('agua');
+				  // message to be sent by Telegram's bot
+					botMessage = `The ISS is flying somewhere over the sea.`;
+				  }
 		  }
           
         } else if (xmlHttp.readyState === 4 && xmlHttp.status === 404) {
@@ -229,6 +248,7 @@ let getCountryCode = url => {
     xmlHttp.send();
 }, 86400000);
 
+   
 //(function(){
 
   // https://blogs.nasa.gov/spacestation/feed/
