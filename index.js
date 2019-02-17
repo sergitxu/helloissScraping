@@ -77,7 +77,6 @@ let getCountryMusic = countryName => {
   let xmlHttp = new XMLHttpRequest()
   let url = `http://ws.audioscrobbler.com/2.0/?method=geo.gettoptracks&country=${countryName}&api_key=0b60a68567872af2073bd9efe40081de&format=json`
 
-
   xmlHttp.onreadystatechange = function() {
       if (xmlHttp.readyState === 4 && xmlHttp.status === 200) {
         let mostListenedSong = JSON.parse(xmlHttp.responseText);
@@ -87,11 +86,11 @@ let getCountryMusic = countryName => {
         let mostListenedSongUrl;
         let mostListenedSongImage;
 
-
-		// TODO try Cocos [Keeling] Islands
-
-		// If there is song info
-		if(mostListenedSong.tracks.track[0] !== undefined){
+		if (mostListenedSong.error){
+			// i.e.: Cocos [Keeling] Islands
+			console.error(`error: ${mostListenedSong.error}, ${mostListenedSong.message}`);
+		} else if(mostListenedSong.tracks.track[0] !== undefined){
+			// If there is song info
 			
 				mostListenedSongName = mostListenedSong.tracks.track[0].name;
 				mostListenedSongArtist = mostListenedSong.tracks.track[0].artist.name;
@@ -108,6 +107,7 @@ let getCountryMusic = countryName => {
 		}
 		// Empty song values
 		else {
+			//i.e.: British Indian Ocean Territory
 			console.log(`empty song values for ${countryName}`);
 			firebase.database().ref('song/').set({
 			  name: '',
@@ -115,8 +115,6 @@ let getCountryMusic = countryName => {
 			  url: '',
 			  image: ''
 			});
-			
-			if (mostListenedSong.error){console.error(`error: ${mostListenedSong.error}, ${mostListenedSong.message}`);}
 		}
 
       } else if (xmlHttp.readyState === 4 && xmlHttp.status === 404) {
