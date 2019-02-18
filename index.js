@@ -135,19 +135,18 @@ let getCountryCode = url => {
 
         if (xmlHttp.readyState === 4 && xmlHttp.status === 200) {
           let ISSCountryLocation = JSON.parse(xmlHttp.responseText);
-			if (ISSCountryLocation) {
-			  if (ISSCountryLocation.geonames[0]) {
+			  if (ISSCountryLocation.geonames[0] !== undefined) {
 				console.log(ISSCountryLocation);
 				let ISScountryCode;
 				let ISScountryName;
 				let ISStoponymName;
 				
 				// Check and set country code, country name and toponym name
-				if(ISSCountryLocation.geonames[0].countryCode && ISSCountryLocation.geonames[0].countryName && ISSCountryLocation.geonames[0].toponymName) {
+				if(ISSCountryLocation.geonames[0].countryCode && ISSCountryLocation.geonames[0].countryName && ISSCountryLocation.geonames[0].adminName1) {
 					
 					ISScountryCode = ISSCountryLocation.geonames[0].countryCode;
 					ISScountryName = ISSCountryLocation.geonames[0].countryName;
-					ISStoponymName = ISSCountryLocation.geonames[0].toponymName;
+					ISStoponymName = ISSCountryLocation.geonames[0].adminName1;
 					
 					console.log(`countryCode: ${ISScountryCode}, countryName: ${ISScountryName}, toponymName: ${ISStoponymName}`);
 					
@@ -171,8 +170,8 @@ let getCountryCode = url => {
 				  console.log('agua');
 				  // message to be sent by Telegram's bot
 					botMessage = `The ISS is flying somewhere over the sea.`;
-				  }
-		  }
+			  }
+		  
           
         } else if (xmlHttp.readyState === 4 && xmlHttp.status === 404) {
             console.error("ERROR! 404");
