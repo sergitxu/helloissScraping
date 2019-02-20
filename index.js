@@ -9,8 +9,8 @@ const axios = require('axios');
 const TelegramBot = require('node-telegram-bot-api');
 const Telegramtoken = '781813938:AAHPG6npR0OCZUgWrbc6nV98cqFZqPZqnbo';
 
-let database = firebase.database();
-
+const database = firebase.database();
+const scheduled = require("scheduled");
 
 // Telegram bot
 const bot = new TelegramBot(Telegramtoken, {polling: true});
@@ -22,27 +22,27 @@ bot.on('message', (msg) => {
 	bot.sendLocation(msg.chat.id, latitude=botLatitude, longitude=botLongitude)
 });
 
-					
 // Get Crew Image
-// Execute once a day
-setInterval(
-    function getCrewImg() {
-    axios.get('http://www.ariss.org/current-iss-crew.html')
-    .then(response => {
-        const $ = cheerio.load(response.data);
-        const issCrewImg = 'http://www.ariss.org' + $('.galleryImageBorder').attr('src');
-
-        firebase.database().ref('ISSCrewImage/').set({
-            url: issCrewImg
-        });
-    })
-    .catch(error => {
-        console.log('error', error);
-    });
-}, 86400000);
+const getCrewImage = new scheduled({
+  id: "getCrewImage",
+  pattern: "0 0 * * * * ", // Execute once a day at midnight http://www.nncron.ru/help/EN/working/cron-format.htm
+  task: function getCrewImg() {
+      axios.get('http://www.ariss.org/current-iss-crew.html')
+      .then(response => {
+          const $ = cheerio.load(response.data);
+          const issCrewImg = 'http://www.ariss.org' + $('.galleryImageBorder').attr('src');
+  
+          firebase.database().ref('ISSCrewImage/').set({
+              url: issCrewImg
+          });
+      })
+      .catch(error => {
+          console.log('error', error);
+      });
+  }
+}).start();
 
 //Get ISS news
-
 setInterval(
   function getISSNews() {
   axios.get('https://blogs.nasa.gov/spacestation/')
