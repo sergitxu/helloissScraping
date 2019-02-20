@@ -14,9 +14,12 @@ let database = firebase.database();
 
 // Telegram bot
 const bot = new TelegramBot(Telegramtoken, {polling: true});
-let botMessage='Let me check, ask me in a minute.'
+let botMessage='Let me check, ask me in a minute.';
+let botLatitude=45.9645851;
+let botLongitude=63.3030541;
 bot.on('message', (msg) => {
 	bot.sendMessage(msg.chat.id, botMessage);
+	bot.sendLocation(msg.chat.id, latitude=botLatitude, longitude=botLongitude)
 });
 
 					
@@ -135,8 +138,11 @@ let getCountryCode = url => {
 
         if (xmlHttp.readyState === 4 && xmlHttp.status === 200) {
           let ISSCountryLocation = JSON.parse(xmlHttp.responseText);
-			  if (ISSCountryLocation.geonames[0] !== undefined) {
+          
+			  if (ISSCountryLocation.geonames && ISSCountryLocation.geonames[0] !== undefined) {
+				  
 				console.log(ISSCountryLocation);
+				
 				let ISScountryCode;
 				let ISScountryName;
 				let ISStoponymName;
@@ -199,6 +205,9 @@ let getCountryCode = url => {
             // get ISS latitude and longitude
             let ISSlatitude = ISSlocation.iss_position.latitude;
             let ISSlongitude = ISSlocation.iss_position.longitude;
+            
+            botLatitude = ISSlatitude;
+            botLongitude = ISSlongitude;
   
             // getCountry based on latitude and longitude
             let countryCodeUrl = `http://api.geonames.org/findNearbyJSON?username=${USERNAME}&lat=${ISSlatitude}&lng=${ISSlongitude}`;
