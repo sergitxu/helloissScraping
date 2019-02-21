@@ -12,6 +12,7 @@
     "axios": "^0.18.0",
     "cheerio": "^1.0.0-rc.2",
     "node-telegram-bot-api": "^0.30.0",
+    "scheduled": "^0.5.0",
     "xmlhttprequest": "^1.8.0"
   },
   "devDependencies": {
