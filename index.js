@@ -85,6 +85,22 @@ function getCrewImg() {
     });
 }
 
+// Get future expeditions
+function getCrewImg() {
+  axios.get('https://www.nasa.gov/mission_pages/station/expeditions/future.html')
+    .then(response => {
+      const $ = cheerio.load(response.data);
+      const futureExpedition = $('.static-landing-page').html();
+
+      database.ref('futureExpeditionInfo/').set({
+        info: futureExpedition
+      });
+    })
+    .catch(error => {
+      console.log('error', error);
+    });
+}
+
 //Get ISS news
 function getISSNews() {
   axios.get('https://blogs.nasa.gov/spacestation/')
