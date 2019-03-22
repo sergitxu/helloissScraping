@@ -2,7 +2,7 @@
 node_modules/
 
 # Firebase data
-/helloiss-service-account.json
+firebase/helloiss-service-account.json
 
 #configuration file
-/config.js
+js/config.js
