@@ -1,2 +1,8 @@
+# node modules folder
 node_modules/
+
+# Firebase data
 helloissScraping/helloiss-service-account.json
+
+#configuration file
+config.js
