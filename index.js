@@ -1,8 +1,4 @@
-
-const TOKEN_TELEGRAM = '781813938:AAHPG6npR0OCZUgWrbc6nV98cqFZqPZqnbo';
-const TOKEN_AUDIOSCROBBLER = '0b60a68567872af2073bd9efe40081de';
-const USER_GEONAMES = 'sergitxu';
-const TOKEN_GMAPS = "AIzaSyApZj382B_afAx4ecNtytJFhvWhTf9WvWw";
+const tokens = require('./config');
 
 // Firebase connexion
 var firebase = require('firebase').initializeApp({
@@ -20,7 +16,7 @@ const scheduled = require("scheduled");
 
 // Telegram bot setup
 const TelegramBot = require('node-telegram-bot-api');
-const Telegramtoken = TOKEN_TELEGRAM;
+const Telegramtoken = tokens.telegram;
 
 // Telegram bot
 const bot = new TelegramBot(Telegramtoken, { polling: true });
@@ -136,7 +132,7 @@ let getCountryMusic = countryName => {
 
   let XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
   let xmlHttp = new XMLHttpRequest()
-  let url = `http://ws.audioscrobbler.com/2.0/?method=geo.gettoptracks&country=${countryName}&api_key=${TOKEN_AUDIOSCROBBLER}&format=json`
+  let url = `http://ws.audioscrobbler.com/2.0/?method=geo.gettoptracks&country=${countryName}&api_key=${tokens.audioscrobbler}&format=json`
 
   xmlHttp.onreadystatechange = function () {
     if (xmlHttp.readyState === 4 && xmlHttp.status === 200) {
@@ -266,12 +262,12 @@ function locateISS() {
         botLongitude = ISSlongitude;
 
         // getCountry based on latitude and longitude
-        let countryCodeUrl = `http://api.geonames.org/findNearbyJSON?username=${USER_GEONAMES}&lat=${ISSlatitude}&lng=${ISSlongitude}`;
+        let countryCodeUrl = `http://api.geonames.org/findNearbyJSON?username=${tokens.geonames}&lat=${ISSlatitude}&lng=${ISSlongitude}`;
 
         const latlon = `${ISSlatitude},${ISSlongitude}`;
         // TODO Mostrar recorrido
         // TODO show a ISS logo in the map
-        const img_url = `https://maps.googleapis.com/maps/api/staticmap?center=${latlon}&zoom=5&size=400x300&sensor=false&key=${TOKEN_GMAPS}`;
+        const img_url = `https://maps.googleapis.com/maps/api/staticmap?center=${latlon}&zoom=5&size=400x300&sensor=false&key=${tokens.gmaps}`;
 
         database.ref('currentPosition/').set({
           urlMap: img_url
