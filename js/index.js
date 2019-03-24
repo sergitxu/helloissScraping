@@ -21,6 +21,7 @@ const Telegramtoken = tokens.telegram;
 // Telegram bot
 const bot = new TelegramBot(Telegramtoken, { polling: true });
 let botMessage = 'Let me check, ask me in a minute.';
+// position of the point where the first ISS was launched.
 let botLatitude = 45.9645851;
 let botLongitude = 63.3030541;
 bot.on('message', (msg) => {
@@ -283,18 +284,3 @@ function locateISS() {
   xmlHttp.open("GET", 'http://api.open-notify.org/iss-now.json', true);
   xmlHttp.send();
 }
-
-//(function(){
-
-  // https://blogs.nasa.gov/spacestation/feed/
-  // news regarding ISS parse RSS xml
-
-  // from https://www.nasa.gov/mission_pages/station/expeditions/index.html
- // var crewImage = document.querySelector("div#cards div.bg-card-canvas").style.backgroundImage;
-
- // var missionOverview = document.querySelector("div#ember1127 div div p");
-  // var currentMission = meta twitter:title;
- // document.getElementById('currentMissionBadge').src = 'https://www.nasa.gov/sites/default/files/styles/1x1_cardfeed/public/thumbnails/image/iss057-s-001b.jpg';
-
-
-//})();
