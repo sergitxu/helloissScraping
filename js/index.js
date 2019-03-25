@@ -56,7 +56,7 @@ bot.on('location', (msg) => {
   axios.get(`https://www.heavens-above.com/PassSummary.aspx?satid=25544&lat=${userLatitude}&lng=${userLongitude}&alt=0&tz=CET`)
     .then(response => {
       const $ = cheerio.load(response.data);
-      const ISSPasses = 'https://www.heavens-above.com' + $('.standardTable tbody tr td a').attr('href');
+      const ISSPasses = 'https://www.heavens-above.com/' + $('.standardTable tbody tr td a').attr('href');
       // TODO add 4 seeing oportunities, send table?
       bot.sendMessage(msg.chat.id, ISSPasses);
 
