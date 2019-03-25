@@ -18,15 +18,63 @@ const scheduled = require("scheduled");
 const TelegramBot = require('node-telegram-bot-api');
 const Telegramtoken = tokens.telegram;
 
+// Get ISS view oportunities on given location
+// function getISSPasses(userLatitude, userLongitude) {
+
+//   let issPasses = '';
+//   axios.get(`https://www.heavens-above.com/PassSummary.aspx?satid=25544&lat=${userLatitude}&lng=${userLongitude}&alt=0&tz=CET`)
+//     .then(response => {
+//       const $ = cheerio.load(response.data);
+//       issPasses = 'https://www.heavens-above.com' + $('.standardTable tbody tr td a').attr('href');
+
+//       console.log(issPasses);
+//       // database.ref('ISSPasses/').set({
+//       //   url: issPasses
+//       // });
+//     })
+//     .catch(error => {
+//       console.log('error', error);
+//     });
+//     return(issPasses);
+  
+// }
+
 // Telegram bot
 const bot = new TelegramBot(Telegramtoken, { polling: true });
 let botMessage = 'Let me check, ask me in a minute.';
 // position of the point where the first ISS was launched.
-let botLatitude = 45.9645851;
-let botLongitude = 63.3030541;
+let botISSLatitude = 45.9645851;
+let botISSLongitude = 63.3030541;
+bot.on('location', (msg) => {
+ 
+  bot.sendMessage(msg.chat.id, msg.location.latitude);
+  bot.sendMessage(msg.chat.id, msg.location.longitude);
+
+  let userLatitude = msg.location.latitude;
+  let userLongitude = msg.location.longitude;
+
+  axios.get(`https://www.heavens-above.com/PassSummary.aspx?satid=25544&lat=${userLatitude}&lng=${userLongitude}&alt=0&tz=CET`)
+    .then(response => {
+      const $ = cheerio.load(response.data);
+      const ISSPasses = 'https://www.heavens-above.com' + $('.standardTable tbody tr td a').attr('href');
+      // TODO add 4 seeing oportunities, send table?
+      bot.sendMessage(msg.chat.id, ISSPasses);
+
+    })
+    .catch(error => {
+      console.log('error', error);
+    });
+
+});
+
 bot.on('message', (msg) => {
-  bot.sendMessage(msg.chat.id, botMessage);
-  bot.sendLocation(msg.chat.id, latitude = botLatitude, longitude = botLongitude)
+  // if (msg.text === 'Where is the ISS?' || msg.text === 'Andandara') {
+    bot.sendMessage(msg.chat.id, botMessage);
+    bot.sendLocation(msg.chat.id, latitude = botISSLatitude, longitude = botISSLongitude);
+  // } 
+  // else {
+  //   bot.sendMessage(msg.chat.id, "Try asking me 'Where is the ISS?' or share your location to see when you can see the ISS");
+  // }
 });
 
 const dailyJob = new scheduled({
@@ -259,8 +307,8 @@ function locateISS() {
         let ISSlatitude = ISSlocation.iss_position.latitude;
         let ISSlongitude = ISSlocation.iss_position.longitude;
 
-        botLatitude = ISSlatitude;
-        botLongitude = ISSlongitude;
+        botISSLatitude = ISSlatitude;
+        botISSLongitude = ISSlongitude;
 
         // getCountry based on latitude and longitude
         let countryCodeUrl = `http://api.geonames.org/findNearbyJSON?username=${tokens.geonames}&lat=${ISSlatitude}&lng=${ISSlongitude}`;
