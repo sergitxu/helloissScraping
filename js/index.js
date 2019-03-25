@@ -18,33 +18,14 @@ const scheduled = require("scheduled");
 const TelegramBot = require('node-telegram-bot-api');
 const Telegramtoken = tokens.telegram;
 
-// Get ISS view oportunities on given location
-// function getISSPasses(userLatitude, userLongitude) {
-
-//   let issPasses = '';
-//   axios.get(`https://www.heavens-above.com/PassSummary.aspx?satid=25544&lat=${userLatitude}&lng=${userLongitude}&alt=0&tz=CET`)
-//     .then(response => {
-//       const $ = cheerio.load(response.data);
-//       issPasses = 'https://www.heavens-above.com' + $('.standardTable tbody tr td a').attr('href');
-
-//       console.log(issPasses);
-//       // database.ref('ISSPasses/').set({
-//       //   url: issPasses
-//       // });
-//     })
-//     .catch(error => {
-//       console.log('error', error);
-//     });
-//     return(issPasses);
-  
-// }
-
 // Telegram bot
 const bot = new TelegramBot(Telegramtoken, { polling: true });
 let botMessage = 'Let me check, ask me in a minute.';
 // position of the point where the first ISS was launched.
 let botISSLatitude = 45.9645851;
 let botISSLongitude = 63.3030541;
+
+// Get ISS view oportunities on given location
 bot.on('location', (msg) => {
  
   bot.sendMessage(msg.chat.id, msg.location.latitude);
