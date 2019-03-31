@@ -37,8 +37,35 @@ bot.on('location', (msg) => {
   axios.get(`https://www.heavens-above.com/PassSummary.aspx?satid=25544&lat=${userLatitude}&lng=${userLongitude}&alt=0&tz=CET`)
     .then(response => {
       const $ = cheerio.load(response.data);
-      const ISSPasses = 'https://www.heavens-above.com/' + $('.standardTable tbody tr td a').attr('href');
-      // TODO add 4 seeing oportunities, send table?
+
+      let ISSPasses = `Next seeing oportunities in your current location:\n`;
+      // TODO add bucle to reduce code
+      //for (i=1; i <= 4; i++) {
+
+        let date1 = $('.standardTable tbody tr:nth-of-type(1) td:nth-of-type(1) a').text();
+        let time1 = $('.standardTable tbody tr:nth-of-type(1) td:nth-of-type(3)').text();
+        let moreInfo1 = 'https://www.heavens-above.com/' + $('.standardTable tbody tr:nth-of-type(1) td:nth-of-type(1) a').attr('href');
+        let ISSPass1 = date1 + ' at ' + time1 + '\nFor more info, see:\n' + moreInfo1 + '\n\n';
+
+        let date2 = $('.standardTable tbody tr:nth-of-type(2) td:nth-of-type(1) a').text();
+        let time2 = $('.standardTable tbody tr:nth-of-type(2) td:nth-of-type(3)').text();
+        let moreInfo2 = 'https://www.heavens-above.com/' + $('.standardTable tbody tr:nth-of-type(2) td:nth-of-type(1) a').attr('href');
+        let ISSPass2 = date2 + ' at ' + time2 + '\nFor more info, see:\n' + moreInfo2 + '\n\n';
+
+        let date3 = $('.standardTable tbody tr:nth-of-type(3) td:nth-of-type(1) a').text();
+        let time3 = $('.standardTable tbody tr:nth-of-type(3) td:nth-of-type(3)').text();
+        let moreInfo3 = 'https://www.heavens-above.com/' + $('.standardTable tbody tr:nth-of-type(3) td:nth-of-type(1) a').attr('href');
+        let ISSPass3 = date3 + ' at ' + time3 + '\nFor more info, see:\n' + moreInfo3 + '\n\n';
+
+        let date4 = $('.standardTable tbody tr:nth-of-type(4) td:nth-of-type(1) a').text();
+        let time4 = $('.standardTable tbody tr:nth-of-type(4) td:nth-of-type(3)').text();
+        let moreInfo4 = 'https://www.heavens-above.com/' + $('.standardTable tbody tr:nth-of-type(4) td:nth-of-type(1) a').attr('href');
+        let ISSPass4 = date4 + ' at ' + time4 + '\nFor more info, see:\n' + moreInfo4 + '\n\n';
+
+         ISSPasses = ISSPasses + ISSPass1 + ISSPass2 + ISSPass3 + ISSPass4
+        
+      //}
+
       bot.sendMessage(msg.chat.id, ISSPasses);
 
     })
