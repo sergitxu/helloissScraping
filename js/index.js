@@ -38,7 +38,7 @@ bot.on('location', (msg) => {
     .then(response => {
       const $ = cheerio.load(response.data);
 
-      let ISSPasses = `Next seeing oportunities in your current location:\n`;
+      let ISSPasses = `Next seeing opportunities in your current location:\n`;
       // TODO add bucle to reduce code
       //for (i=1; i <= 4; i++) {
 
