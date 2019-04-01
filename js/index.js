@@ -26,11 +26,12 @@ let botISSLatitude = 45.9645851;
 let botISSLongitude = 63.3030541;
 
 // Get ISS view oportunities on given location
+bot.onText(/\/wannasee/, (msg) => {
+	bot.sendMessage(msg.chat.id, 'Please, share your current location with me to show you when and how you can see the ISS');
+	//KeyboardButton (text = '', request_location	= true )
+});
 bot.on('location', (msg) => {
  
-  bot.sendMessage(msg.chat.id, msg.location.latitude);
-  bot.sendMessage(msg.chat.id, msg.location.longitude);
-
   let userLatitude = msg.location.latitude;
   let userLongitude = msg.location.longitude;
 
@@ -45,22 +46,22 @@ bot.on('location', (msg) => {
         let date1 = $('.standardTable tbody tr:nth-of-type(1) td:nth-of-type(1) a').text();
         let time1 = $('.standardTable tbody tr:nth-of-type(1) td:nth-of-type(3)').text();
         let moreInfo1 = 'https://www.heavens-above.com/' + $('.standardTable tbody tr:nth-of-type(1) td:nth-of-type(1) a').attr('href');
-        let ISSPass1 = date1 + ' at ' + time1 + '\nFor more info, see:\n' + moreInfo1 + '\n\n';
+        let ISSPass1 = date1 + ' at ' + time1 + '\nMore info:\n' + moreInfo1 + '\n\n';
 
         let date2 = $('.standardTable tbody tr:nth-of-type(2) td:nth-of-type(1) a').text();
         let time2 = $('.standardTable tbody tr:nth-of-type(2) td:nth-of-type(3)').text();
         let moreInfo2 = 'https://www.heavens-above.com/' + $('.standardTable tbody tr:nth-of-type(2) td:nth-of-type(1) a').attr('href');
-        let ISSPass2 = date2 + ' at ' + time2 + '\nFor more info, see:\n' + moreInfo2 + '\n\n';
+        let ISSPass2 = date2 + ' at ' + time2 + '\nMore info:\n' + moreInfo2 + '\n\n';
 
         let date3 = $('.standardTable tbody tr:nth-of-type(3) td:nth-of-type(1) a').text();
         let time3 = $('.standardTable tbody tr:nth-of-type(3) td:nth-of-type(3)').text();
         let moreInfo3 = 'https://www.heavens-above.com/' + $('.standardTable tbody tr:nth-of-type(3) td:nth-of-type(1) a').attr('href');
-        let ISSPass3 = date3 + ' at ' + time3 + '\nFor more info, see:\n' + moreInfo3 + '\n\n';
+        let ISSPass3 = date3 + ' at ' + time3 + '\nMore info:\n' + moreInfo3 + '\n\n';
 
         let date4 = $('.standardTable tbody tr:nth-of-type(4) td:nth-of-type(1) a').text();
         let time4 = $('.standardTable tbody tr:nth-of-type(4) td:nth-of-type(3)').text();
         let moreInfo4 = 'https://www.heavens-above.com/' + $('.standardTable tbody tr:nth-of-type(4) td:nth-of-type(1) a').attr('href');
-        let ISSPass4 = date4 + ' at ' + time4 + '\nFor more info, see:\n' + moreInfo4 + '\n\n';
+        let ISSPass4 = date4 + ' at ' + time4 + '\nMre info:\n' + moreInfo4 + '\n\n';
 
          ISSPasses = ISSPasses + ISSPass1 + ISSPass2 + ISSPass3 + ISSPass4
         
@@ -75,14 +76,10 @@ bot.on('location', (msg) => {
 
 });
 
-bot.on('message', (msg) => {
-  // if (msg.text === 'Where is the ISS?' || msg.text === 'Andandara') {
+// Receiving the where command, shows the current ISS location
+bot.onText(/\/where/, (msg) => {
     bot.sendMessage(msg.chat.id, botMessage);
     bot.sendLocation(msg.chat.id, latitude = botISSLatitude, longitude = botISSLongitude);
-  // } 
-  // else {
-  //   bot.sendMessage(msg.chat.id, "Try asking me 'Where is the ISS?' or share your location to see when you can see the ISS");
-  // }
 });
 
 const dailyJob = new scheduled({
