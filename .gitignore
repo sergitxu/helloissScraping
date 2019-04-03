@@ -4,5 +4,8 @@ node_modules/
 # Firebase data
 firebase/helloiss-service-account.json
 
-#configuration file
+# Configuration file
 js/config.js
+
+# temporal file
+.DS_Store
