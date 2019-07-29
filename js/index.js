@@ -89,6 +89,7 @@ const dailyJob = new scheduled({
     getCrew();
     getCrewImg();
     getISSNews();
+    // getFutureExpeditions();
   }
 }).start();
 
@@ -136,7 +137,7 @@ function getCrewImg() {
 }
 
 // Get future expeditions
-function getCrewImg() {
+function getFutureExpeditions() {
   axios.get('https://www.nasa.gov/mission_pages/station/expeditions/future.html')
     .then(response => {
       const $ = cheerio.load(response.data);
