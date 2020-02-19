@@ -16,6 +16,6 @@
     "xmlhttprequest": "^1.8.0"
   },
   "devDependencies": {
-    "firebase": "^5.8.1"
+    "firebase": "^7.8.2"
   }
 }

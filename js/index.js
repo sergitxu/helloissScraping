@@ -95,7 +95,7 @@ const dailyJob = new scheduled({
 
 const minuteJob = new scheduled({
   id: "minuteJob",
-  pattern: "*", // Execute once a minute
+  pattern: "0 0/3 0 ? * * *", // Execute once every 3 minutes
   task: function initEachMinute() {
     locateISS();
   }
@@ -322,7 +322,7 @@ function locateISS() {
         const latlon = `${ISSlatitude},${ISSlongitude}`;
         // TODO Mostrar recorrido
         // TODO show a ISS logo in the map
-        const img_url = `https://maps.googleapis.com/maps/api/staticmap?center=${latlon}&zoom=5&size=400x300&sensor=false&key=${tokens.gmaps}`;
+        const img_url = `https://www.mapquestapi.com/staticmap/v5/map?key=${tokens.mapquest}&center=${latlon}&zoom=4&type=hyb&size=600,400@2x`
 
         database.ref('currentPosition/').set({
           urlMap: img_url
