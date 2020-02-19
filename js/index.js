@@ -95,7 +95,7 @@ const dailyJob = new scheduled({
 
 const minuteJob = new scheduled({
   id: "minuteJob",
-  pattern: "0 0/3 0 ? * * *", // Execute once every 3 minutes
+  pattern: "*/3 * * * *", // Execute once every 3 minutes
   task: function initEachMinute() {
     locateISS();
   }
@@ -300,6 +300,8 @@ let getCountryCode = url => {
 // Get ISS current location
 // execute once a minute
 function locateISS() {
+
+  console.log('3minutes');
 
   var XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
   var xmlHttp = new XMLHttpRequest();
