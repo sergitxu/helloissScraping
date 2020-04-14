@@ -84,7 +84,7 @@ bot.onText(/\/where/, (msg) => {
 
 const dailyJob = new scheduled({
   id: "dailyJob",
-  pattern: "0 0 * * * *", // Execute once a day at midnight
+  pattern: "0 0 7 * * *", // Execute once a day at 7am
   task: function initDaily() {
     getCrew();
     getCrewImg();
